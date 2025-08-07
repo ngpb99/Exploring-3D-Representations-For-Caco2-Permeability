@@ -5,6 +5,7 @@ This repository contains the necessary scripts to replicate the work performed.
 
   Contains the main scripts for evaluations.
 
+<br>
 
 **2. generate_conformers.py & calc_mordred.py**
 
