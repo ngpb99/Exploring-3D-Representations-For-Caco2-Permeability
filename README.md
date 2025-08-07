@@ -19,7 +19,7 @@ Contains helper functions to extract embeddings, assist in model training and te
 
 <br>
 
-To run this project, follow the steps below depending on whether you want to recalculate descriptors or use the precomputed ones.
+To replicate this project, follow the steps below depending on whether you want to recalculate descriptors or use the precomputed ones. PLease ensure all necessary directories are in place, which can be found in the link, before executing the scripts. All trained models and data files can be retrieved from [here](https://github.com/ngpb99/Exploring-3D-Representations-For-Caco2-Permeability/edit/main/README.md).
 ## Option 1: Recalculate Mordred Descriptors
 1. Set up the main environment (used for conformer generation and running all code except Mordred):
 ```bash
@@ -39,7 +39,7 @@ python calc_mordred.py
 4. Switch back to main environment to continue with the rest of the pipeline.
 
 ## Option 2: Use Precomputed Descriptors (Recommended)
-1. Download the precomputed Mordred descriptors [here](https://github.com/ngpb99/Exploring-3D-Representations-For-Caco2-Permeability/edit/main/README.md).
+1. Download the precomputed Mordred descriptors.
 2. Set up the main environment:
 ```bash
 conda env create -f environment.yml --name Caco2-3D
