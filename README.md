@@ -1,7 +1,7 @@
 # Exploring-3D-Representations-For-Caco2-Permeability
 This repository contains the necessary scripts to replicate the work performed.
 
-**1. main folder**
+1. **main folder**
 
   Contains the main scripts for evaluations.
 
