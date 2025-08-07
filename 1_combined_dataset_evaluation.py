@@ -174,7 +174,12 @@ class ModelTrainer:
         with open('./trained_models/eval_1_combined/graphormer/model_performance.json', 'w') as f:
             json.dump(performance_dict, f, indent=2)
     
-    def unimol(self):
+    def unimol(self, rep):
+        trainer = UniMolTrainer(self.train_file, self.test_file)
+        save_dir = f'./trained_models/eval_1_combined/unimol/rep_{rep}'
+        trainer.model_training(save_dir, train_batch_size=16, train_epochs=100, early_stopping=10)
+
+    def unimol_eval(self):
         trainer = UniMolTrainer(self.train_file, self.test_file)
         mae_score = []
         mse_score = []
@@ -182,7 +187,6 @@ class ModelTrainer:
         performance_dict = {}
         for rep in range(self.n_repetition):
             save_dir = f'./trained_models/eval_1_combined/unimol/rep_{rep}'
-            trainer.model_training(save_dir, train_batch_size=16, train_epochs=100, early_stopping=10)
             r2, mse, mae = trainer.model_testing(save_dir)
             r2_score.append(r2)
             mse_score.append(mse)
@@ -202,7 +206,8 @@ class ModelTrainer:
         self.rf_predictions(desc_name='rdkit')
         self.chemberta()
         self.graphormer()
-        self.unimol()
+        self.unimol(rep=2)
+        self.unimol_eval()
 
 
 
@@ -552,4 +557,5 @@ def main():
     analyzer.init_all()
 
 if __name__ == "__main__":
+
     main()
