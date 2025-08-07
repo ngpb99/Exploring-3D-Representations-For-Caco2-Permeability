@@ -1,8 +1,15 @@
 # Exploring-3D-Representations-For-Caco2-Permeability
 This repository contains the necessary scripts to replicate the work performed.
-1. 
-To run this project, follow the steps below depending on whether you want to recalculate descriptors or use the precomputed ones.
+1. main folder
+  Contains the main scripts for evaluations.
 
+2. generate_conformers.py & calc_mordred.py
+  Used to generate 3D conformers for mordred 3D descriptor calculations, and calculate the corresponding mordred descriptors
+
+3. embeddings.py, engine.py, visualization.py
+  Contains helper functions to extract embeddings, assist in model training and testing, and plotting.
+
+To run this project, follow the steps below depending on whether you want to recalculate descriptors or use the precomputed ones.
 ## Option 1: Recalculate Mordred Descriptors
 1. Set up the main environment (used for conformer generation and running all code except Mordred):
 ```bash
