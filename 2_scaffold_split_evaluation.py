@@ -196,8 +196,10 @@ class ModelTrainer:
             )
         with open('./trained_models/eval_2_scaffold/graphormer/model_performance.json', 'w') as f:
             json.dump(performance_dict, f, indent=2)
-        
-    def unimol(self, rep): # Seed for Uni-Mol needs to be changed internally. Uni-Mol does not take in seeds as arguments. Seeds used: 42, 43, 44
+
+    # Seed for Uni-Mol needs to be changed internally as it does not take in seeds as arguments.
+    # Please change it in the source code and run this method repeatedly with different seeds. Seeds used: 42, 43, 44
+    def unimol(self, rep): 
         performance_dict = {}
         for ss in self.split_strategy:
             train_file = f'./data/eval_2_scaffold/{ss}_scaffold_train.csv'
@@ -445,4 +447,5 @@ def main():
     analyzer.init_all()
 
 if __name__ == "__main__":
+
     main()
