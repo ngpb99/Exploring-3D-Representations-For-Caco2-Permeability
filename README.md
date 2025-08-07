@@ -2,6 +2,6 @@
 Exploring the effectiveness of three-dimensional molecular representations in Caco-2 permeability prediction
 
 ## Requirements
-To calculate mordred descriptors, install:
-```bash
+To calculate mordred descriptors, install:```bash
 conda env create -f mordred_environment.yml
+'''
