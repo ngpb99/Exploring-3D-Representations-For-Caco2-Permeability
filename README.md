@@ -1,15 +1,10 @@
 # Exploring-3D-Representations-For-Caco2-Permeability
-This repository contains the necessary scripts to replicate the work performed.
-1. conformer_engine.py & calc_mordred.py
-   Please perform 
-  
+To run this project, follow the steps below depending on whether you want to recalculate descriptors or use the precomputed ones.
 
-## Requirements
-To calculate mordred descriptors, install the following environment and run calc_mordred.py (Pre-calculated descriptors are available for download, so you can skip this step if you prefer):
+## Option 1: Recalculate Mordred Descriptors
+1. Set up the main environment (used for conformer generation and running all code except Mordred):
 ```bash
-conda env create -f mordred_environment.yml
-```
-If you’re using the precomputed descriptors, simply install the required dependencies for the main code:
-```bash
-conda env create -f environment.yml
+conda env create -f environment.yml --name Caco2-3D
+conda activate Caco2-3D
+python conf
 ```
