@@ -1,4 +1,4 @@
-# Exploring-3D-Representations-For-Caco2-Permeability
+# Exploring the Effectiveness of Three-Dimensional Molecular Representations in Caco-2 Permeability Prediction
 This repository contains the necessary scripts to replicate the work performed.
 
 **1. main folder**
