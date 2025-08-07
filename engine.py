@@ -134,7 +134,7 @@ class PredefinedFeatures:
             train_mordred = pd.read_csv(train_file)
             test_mordred = pd.read_csv(test_file)
         else:
-            return 'Please run engine_mordred with the appropriate environment'
+            return 'Please run conformer_engine & calc_mordred with the appropriate environment'
         return train_mordred, test_mordred
 
 
@@ -635,4 +635,5 @@ class UniMolTrainer:
         r2 = r2_score(test_data['logPapp'], test_data['pred_logPapp'])
         mae = mean_absolute_error(test_data['logPapp'], test_data['pred_logPapp'])
         mse = mean_squared_error(test_data['logPapp'], test_data['pred_logPapp'])
+
         return r2, mse, mae
