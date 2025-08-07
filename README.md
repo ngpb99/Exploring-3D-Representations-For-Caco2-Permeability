@@ -2,15 +2,15 @@
 This repository contains the necessary scripts to replicate the work performed.
 1. main folder
 
-Contains the main scripts for evaluations.
+  Contains the main scripts for evaluations.
 
 2. generate_conformers.py & calc_mordred.py
 
-Used to generate 3D conformers for mordred 3D descriptor calculations, and calculate the corresponding mordred descriptors
+  Used to generate 3D conformers for mordred 3D descriptor calculations, and calculate the corresponding mordred descriptors
 
 3. embeddings.py, engine.py, visualization.py
 
-Contains helper functions to extract embeddings, assist in model training and testing, and plotting.
+  Contains helper functions to extract embeddings, assist in model training and testing, and plotting.
 
 To run this project, follow the steps below depending on whether you want to recalculate descriptors or use the precomputed ones.
 ## Option 1: Recalculate Mordred Descriptors
