@@ -39,7 +39,7 @@ python calc_mordred.py
 4. Switch back to main environment to continue with the rest of the pipeline.
 
 ## Option 2: Use Precomputed Descriptors (Recommended)
-1. Download the precomputed Mordred descriptors here.
+1. Download the precomputed Mordred descriptors [here](https://github.com/ngpb99/Exploring-3D-Representations-For-Caco2-Permeability/edit/main/README.md).
 2. Set up the main environment:
 ```bash
 conda env create -f environment.yml --name Caco2-3D
