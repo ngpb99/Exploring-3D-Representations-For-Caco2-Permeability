@@ -11,5 +11,5 @@ conda env create -f mordred_environment.yml
 ```
 If you’re using the precomputed descriptors, simply install the required dependencies for the main code:
 ```bash
-conda env create -f mordred_environment.yml
+conda env create -f environment.yml
 ```
