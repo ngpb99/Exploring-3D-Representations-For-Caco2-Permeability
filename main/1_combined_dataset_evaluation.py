@@ -475,11 +475,11 @@ class ModelAnalyzer:
         dist = 0.5
         for rep in range(self.n_repetition):
             for fold in range(self.num_folds):
-                lgbm_model_name = f'LightGBM Rep {rep} Fold {fold}'
-                rf_model_name = f'RF Rep {rep} Fold {fold}'
-                cberta_model_name = f'ChemBERTa-2 Rep {rep} Fold {fold}'
-                graphormer_model_name = f'Graphormer Rep {rep} Fold {fold}'
-                unimol_model_name = f'Uni-Mol Rep {rep} Fold {fold}'
+                lgbm_model_name = f'LightGBM Rep {rep+1} Fold {fold+1}'
+                rf_model_name = f'RF Rep {rep+1} Fold {fold+1}'
+                cberta_model_name = f'ChemBERTa-2 Rep {rep+1} Fold {fold+1}'
+                graphormer_model_name = f'Graphormer Rep {rep+1} Fold {fold+1}'
+                unimol_model_name = f'Uni-Mol Rep {rep+1} Fold {fold+1}'
                 lgbm_top_descs = self.select_top_features(test_desc_file=test_desc_file, 
                                                           trained_model_file=f'./trained_models/eval_1_combined/lightgbm/rep_{rep}/rdkit_trained_model_fold_{fold}.pkl',
                                                           num_top_features=num_features)
@@ -559,6 +559,6 @@ def main():
     analyzer.init_all()
 
 if __name__ == "__main__":
-
     main()
+
 
