@@ -580,7 +580,7 @@ class Embeddings:
             embeddings_df['logPapp'] = true_list
             output_df = pd.DataFrame(output_array)
             embeds = pd.concat([embeddings_df, output_df], axis=1)
-            embeds.to_csv(os.path.join(embeds_dir, f'Graphormer_learned_embeddings_fold_{fold_no}.csv'), index=False)
+            embeds.to_csv(embeds_file, index=False)
             gc.collect()
             torch.cuda.empty_cache()
         return embeds
@@ -605,4 +605,5 @@ class Embeddings:
             embeds.to_csv(embeds_file, index=False)
             gc.collect()
             torch.cuda.empty_cache()
+
         return embeds
