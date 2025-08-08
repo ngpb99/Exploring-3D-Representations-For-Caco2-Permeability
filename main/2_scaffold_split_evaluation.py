@@ -332,7 +332,7 @@ class ModelAnalyzer:
             test_file = f'./data/eval_2_scaffold/{ss}_scaffold_test.csv'
             train_rdkit, test_rdkit = trainers.get_features_rdkit(train_file, test_file)
             for fold in range(self.num_folds):
-                rf_model_name = f'RF Split {i+1} Fold {fold}'
+                rf_model_name = f'RF Split {i+1} Fold {fold+1}'
                 rf_top_descs = self.select_top_features(test_desc=test_rdkit, 
                                                         trained_model_file=f'./trained_models/eval_2_scaffold/rf/{ss}/rdkit_trained_model_fold_{fold}.pkl',
                                                         num_top_features=self.num_features)
@@ -347,7 +347,7 @@ class ModelAnalyzer:
             test_file = f'./data/eval_2_scaffold/{ss}_scaffold_test.csv'
             train_rdkit, test_rdkit = trainers.get_features_rdkit(train_file, test_file)
             for fold in range(self.num_folds):
-                lgbm_model_name = f'LightGBM Split {i+1} Fold {fold}'
+                lgbm_model_name = f'LightGBM Split {i+1} Fold {fold+1}'
                 lgbm_top_descs = self.select_top_features(test_desc=test_rdkit, 
                                                           trained_model_file=f'./trained_models/eval_2_scaffold/lightgbm/{ss}/rdkit_trained_model_fold_{fold}.pkl',
                                                           num_top_features=self.num_features)
@@ -358,10 +358,10 @@ class ModelAnalyzer:
     def cberta_embeddings(self, rep):
         for i, ss in enumerate(self.split_strategy):
             for fold in range(self.num_folds):
-                model_name = f'ChemBERTa-2 Split {i+1} Fold {fold}'
+                model_name = f'ChemBERTa-2 Split {i+1} Rep {rep+1} Fold {fold+1}'
                 embeddings_df = self.embed_extractor.chemberta(model_dir=f'./trained_models/eval_2_scaffold/chemberta-2/rep_{rep}/{ss}',
                                                                test_dir=f'./data/eval_2_scaffold/{ss}_scaffold_test.csv',
-                                                               embeds_dir=f'./embeddings/eval_2_scaffold/chemberta-2/{ss}',
+                                                               embeds_dir=f'./embeddings/eval_2_scaffold/chemberta-2/rep_{rep}/{ss}',
                                                                fold_no=fold)
                 self.plot.draw_umap(embeddings_df, model_name, 
                                     n_neighbors=200, min_dist=0.5, seed=self.seed)
@@ -369,7 +369,7 @@ class ModelAnalyzer:
     def graphormer_embeddings(self):
         for i, ss in enumerate(self.split_strategy):
             for fold in range(self.num_folds):
-                model_name = f'Graphormer Split {i+1} Fold {fold}'
+                model_name = f'Graphormer Split {i+1} Fold {fold+1}'
                 embeddings_df = self.embed_extractor.graphormer(model_dir=f'./trained_models/eval_2_scaffold/graphormer/{ss}',
                                                                 test_dir=f'./data/2D_graph_data/eval_2_scaffold/{ss}',
                                                                 embeds_dir=f'./embeddings/eval_2_scaffold/graphormer/{ss}',
@@ -380,10 +380,10 @@ class ModelAnalyzer:
     def unimol_embeddings(self, rep):
         for i, ss in enumerate(self.split_strategy):
             for fold in range(self.num_folds):
-                model_name = f'Uni-Mol Split {i+1} Fold {fold}'
+                model_name = f'Uni-Mol Split {i+1} Fold {fold+1}'
                 embeddings_df = self.embed_extractor.unimol(model_dir=f'./trained_models/eval_2_scaffold/unimol/rep_{rep}/{ss}',
                                                             test_dir=f'./data/eval_2_scaffold/{ss}_scaffold_test.csv',
-                                                            embeds_dir=f'./embeddings/eval_2_scaffold/unimol/{ss}',
+                                                            embeds_dir=f'./embeddings/eval_2_scaffold/unimol/rep_{rep}/{ss}',
                                                             fold_no=fold)
                 self.plot.draw_umap(embeddings_df, model_name, 
                                     n_neighbors=200, min_dist=0.5, seed=self.seed)
@@ -447,5 +447,5 @@ def main():
     analyzer.init_all()
 
 if __name__ == "__main__":
-
     main()
+
