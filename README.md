@@ -19,7 +19,7 @@ Contains helper functions to extract embeddings, assist in model training and te
 
 <br>
 
-To replicate this project, follow the steps below depending on whether you want to recalculate descriptors or use the precomputed ones. Please ensure all necessary directories are in place, which can be found in the link, before executing the scripts. All trained models and data files can be retrieved from [here](blank).
+To replicate this project, follow the steps below depending on whether you want to recalculate descriptors or use the precomputed ones. Please ensure all necessary directories are in place, which can be found in the link, before executing the scripts. All trained models and data files can be retrieved from [here](https://entuedu-my.sharepoint.com/:u:/g/personal/png032_e_ntu_edu_sg/EeCuNTFLvKNMtmV_P8ryiQgBl_DkqUudIG7HsAGZNUUXQQ?e=hV1a5A).
 ## Option 1: Recalculate Mordred Descriptors
 1. Set up the main environment (used for conformer generation and running all code except Mordred):
 ```bash
