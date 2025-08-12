@@ -607,24 +607,3 @@ class Embeddings:
             torch.cuda.empty_cache()
         return embeds
 
-    def unimol_train_valid(self, model_dir, test_dir, embeds_dir, fold_no):
-        embeds_file = os.path.join(embeds_dir, f'unimol_embeddings_fold_{fold_no}.csv')
-        if os.path.isfile(embeds_file):
-            embeds = pd.read_csv(embeds_file)
-        else:
-            save_path=model_dir
-            config, data, model, loss_func, activation_fn, target_scaler, features = init_variables(model_dir, test_dir, save_path)
-            t = TrainerModified(save_path=save_path, **config)
-            testdataset = NNDataset(features, np.asarray(data['target']))
-            embeddings, true_values = t.predict(model, testdataset, loss_func, activation_fn, save_path, fold=0,
-                                                target_scaler=target_scaler, epoch=1, load_model=True)
-            true_array = np.array(true_values)
-            true_array = true_array.flatten()
-            true_df = pd.DataFrame()
-            true_df['logPapp'] = true_array
-            embed = pd.DataFrame(embeddings)
-            embeds = pd.concat([true_df, embed], axis=1)
-            embeds.to_csv(embeds_file, index=False)
-            gc.collect()
-            torch.cuda.empty_cache()
-        return embeds
