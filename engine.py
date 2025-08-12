@@ -1,4 +1,5 @@
 import torch
+from embeddings import Embeddings
 from torch.utils.data import Dataset as TorchDataset
 from torch.utils.data import DataLoader
 from transformers import AutoConfig, AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments, GraphormerForGraphClassification
@@ -334,6 +335,82 @@ class LGBMTrainer:
         model = joblib.load(model_file)
         y_pred = model.predict(pred_data)
         return y_pred
+    
+    @staticmethod
+    def model_tuning_unimol_embeds(train, rep):
+        def objective(trial):
+            params = {'num_leaves': trial.suggest_int('num_leaves', 10, 65),
+                      'min_child_samples': trial.suggest_int('min_child_samples', 10, 65),
+                      'n_estimators': trial.suggest_int('n_estimators', 50, 500),
+                      'learning_rate':trial.suggest_float('learning_rate', 0.01, 0.1)
+                      }
+            kfold = KFold(n_splits=5)
+            lgb_model = LGBMRegressor(num_leaves=params['num_leaves'], 
+                                      min_child_samples=params['min_child_samples'], 
+                                      n_estimators=params['n_estimators'],
+                                      learning_rate=params['learning_rate'],
+                                      feature_fraction=0.8,
+                                      seed=rep)
+            embed_extractor = Embeddings()
+            total_mse = 0
+            for fold_no, (train_idx, valid_idx) in enumerate(kfold.split(train)):
+                train_data, valid_data = train.iloc[train_idx,:], train.iloc[valid_idx,:]
+                train_dir = f'./data/eval_1_combined/dataset/train_split_fold_{fold_no}.csv'
+                valid_dir = f'./data/eval_1_combined/dataset/valid_split_fold_{fold_no}.csv'
+                train_data.to_csv(train_dir, index=False)
+                valid_data.to_csv(valid_dir, index=False)
+                train_embeddings_df = embed_extractor.unimol_train_valid(model_dir='./trained_models/eval_1_combined/unimol/full', 
+                                                                         test_dir=train_dir, 
+                                                                         embeds_dir=f'./embeddings/eval_1_combined/unimol_full/train/rep_{rep}', 
+                                                                         fold_no=fold_no)
+                valid_embeddings_df = embed_extractor.unimol_train_valid(model_dir='./trained_models/eval_1_combined/unimol/full', 
+                                                                         test_dir=valid_dir, 
+                                                                         embeds_dir=f'./embeddings/eval_1_combined/unimol_full/valid/rep_{rep}', 
+                                                                         fold_no=fold_no)
+                x_train, x_valid = train_embeddings_df.drop(columns=['logPapp']), valid_embeddings_df.drop(columns=['logPapp'])
+                y_train, y_valid = train_embeddings_df['logPapp'], valid_embeddings_df['logPapp']
+                lgb_model.fit(x_train, y_train)
+                y_pred = lgb_model.predict(x_valid)
+                mse = mean_squared_error(y_valid, y_pred)
+                total_mse += mse
+            return mse/5
+        study = optuna.create_study(direction='minimize')
+        study.optimize(objective, n_trials=100)
+        trial_ = study.best_trial
+        return trial_.params
+    
+    @staticmethod
+    def model_testing_unimol_embeds(best_params, model_dir, rep, num_folds=5):
+        lgb_model = LGBMRegressor(num_leaves=best_params['num_leaves'], 
+                                  min_child_samples=best_params['min_child_samples'], 
+                                  n_estimators=best_params['n_estimators'],
+                                  learning_rate=best_params['learning_rate'],
+                                  feature_fraction=0.8,
+                                  seed=rep)
+        r2 = 0
+        mae = 0
+        mse = 0
+        embed_extractor = Embeddings()
+        test_dir =  './data/eval_1_combined/dataset/test_data.csv'
+        for fold_no in range(num_folds):
+            train_dir = f'./data/eval_1_combined/dataset/train_split_fold_{fold_no}.csv'
+            train_embeddings_df = embed_extractor.unimol_train_valid(model_dir='./trained_models/eval_1_combined/unimol/full', 
+                                                                     test_dir=train_dir, 
+                                                                     embeds_dir=f'./embeddings/eval_1_combined/unimol_full/train/rep_{rep}', 
+                                                                     fold_no=fold_no)
+            test_embeddings_df = embed_extractor.unimol_train_valid(model_dir='./trained_models/eval_1_combined/unimol/full', 
+                                                                    test_dir=test_dir, 
+                                                                    embeds_dir=f'./embeddings/eval_1_combined/unimol_full/test/rep_{rep}', 
+                                                                    fold_no=fold_no)
+            x_train, x_test = train_embeddings_df.drop(columns=['logPapp']), test_embeddings_df.drop(columns=['logPapp'])
+            y_train, y_test = train_embeddings_df['logPapp'], test_embeddings_df['logPapp']
+            lgb_model.fit(x_train, y_train)
+            joblib.dump(lgb_model, os.path.join(model_dir, f'unimol_embeddings_trained_model_fold_{fold_no}.pkl'))
+            y_pred = lgb_model.predict(x_test)
+            r2 += r2_score(y_test, y_pred)
+            mae += mean_absolute_error(y_test, y_pred)
+            mse += mean_squared_error(y_test, y_pred)
+        return r2/5, mse/5, mae/5
 
 
 
@@ -635,5 +712,4 @@ class UniMolTrainer:
         r2 = r2_score(test_data['logPapp'], test_data['pred_logPapp'])
         mae = mean_absolute_error(test_data['logPapp'], test_data['pred_logPapp'])
         mse = mean_squared_error(test_data['logPapp'], test_data['pred_logPapp'])
-
         return r2, mse, mae
