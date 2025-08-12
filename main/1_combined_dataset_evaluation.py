@@ -49,7 +49,7 @@ class ModelTrainer:
             mse_score = []
             r2_score = []
             for rep in range(self.n_repetition):
-                model_dir = f'./trained_models/eval_1_combined/lightgbm/predefined/rep_{rep}'
+                model_dir = f'./trained_models/eval_1_combined/lightgbm/rep_{rep}'
                 trainer = LGBMTrainer(train_list[i], test_list[i], seed=rep)
                 best_params = trainer.model_tuning()
                 params_dict[f'{names[i]}_rep_{rep}'] = best_params
@@ -74,13 +74,13 @@ class ModelTrainer:
             trainer = LGBMTrainer(train, test, seed=rep)
             predictions_df = pd.DataFrame()
             for fold in range(self.num_folds):
-                model_file = f'./trained_models/eval_1_combined/lightgbm/predefined/rep_{rep}/{desc_name}_trained_model_fold_{fold}.pkl'
+                model_file = f'./trained_models/eval_1_combined/lightgbm/rep_{rep}/{desc_name}_trained_model_fold_{fold}.pkl'
                 pred = trainer.model_predict(model_file)
                 predictions_df[f'fold_{fold}_pred'] = pred
             predictions_df['pred_logPapp'] = predictions_df.mean(axis=1)
             predictions_df['SMILES'] = test['SMILES']
             predictions_df['logPapp'] = test['logPapp']
-            predictions_df.to_csv(f'./trained_models/eval_1_combined/lightgbm/predefined/rep_{rep}/predictions.csv', index=False)
+            predictions_df.to_csv(f'./trained_models/eval_1_combined/lightgbm/rep_{rep}/predictions.csv', index=False)
     
     def rf(self):
         train_list, test_list = self.get_features()
@@ -201,36 +201,6 @@ class ModelTrainer:
         with open('./trained_models/eval_1_combined/unimol/model_performance.json', 'w') as f:
             json.dump(performance_dict, f, indent=2)
     
-    def unimol_no_cv(self):
-        trainer = UniMolTrainer(self.train_file, self.test_file)
-        save_dir = './trained_models/eval_1_combined/unimol/full'
-        trainer.model_training(self, save_dir, train_batch_size=16, train_epochs=100, early_stopping=10, folds=1)
-    
-    def lgbm_unimol_embeddings(self):
-        train = pd.read_csv('./data/eval_1_combined/dataset/train_data.csv')
-        params_dict = {}
-        performance_dict = {}
-        r2_list = []
-        mae_list = []
-        mse_list = []
-        for rep in range(self.n_repetition):
-            model_dir = f'./trained_models/eval_1_combined/lightgbm/unimol_embeds/rep_{rep}'
-            best_params = LGBMTrainer.model_tuning_unimol_embeds(train, rep)
-            r2, mse, mae = LGBMTrainer.model_testing_unimol_embeds(best_params=best_params, model_dir=model_dir, rep=rep)
-            r2_list.append(r2)
-            mse_list.append(mse)
-            mae_list.append(mae)
-            params_dict[f'rep_{rep}'] = best_params
-        performance_dict['unimol_embedding_performance'] = (
-            f'R2: {np.mean(r2_list):.4f} +/- {np.std(r2_list):.4f} '
-            f'MAE: {np.mean(mae_list):.4f} +/- {np.std(mae_list):.4f} '
-            f'MSE: {np.mean(mse_list):.4f} +/- {np.std(mse_list):.4f}'
-        )
-        with open('./trained_models/eval_1_combined/lightgbm/unimol_embeds/best_hyperparams.json', 'w') as f:
-            json.dump(params_dict, f, indent=2)
-        with open('./trained_models/eval_1_combined/lightgbm/unimol_embeds/model_performance.json', 'w') as f:
-            json.dump(performance_dict, f, indent=2)
-    
     def init_all(self):
         self.lgbm()
         self.lgbm_predictions(desc_name='rdkit') # Predict for RDKit only as it is best descriptor
@@ -240,8 +210,6 @@ class ModelTrainer:
         self.graphormer()
         self.unimol(rep=2)
         self.unimol_eval()
-        self.unimol_no_cv()
-        self.lgbm_unimol_embeddings()
 
 
 
@@ -298,7 +266,7 @@ class ModelAnalyzer:
     def lgbm_top_descs_analysis(self, test_desc_file, train_desc_file, num_top_features=100):
         for rep in range(self.n_repetition):
             for fold in range(self.num_folds):
-                trained_model_file=f'./trained_models/eval_1_combined/lightgbm/predefined/rep_{rep}/rdkit_trained_model_fold_{fold}.pkl'
+                trained_model_file=f'./trained_models/eval_1_combined/lightgbm/rep_{rep}/rdkit_trained_model_fold_{fold}.pkl'
                 train_rdkit = pd.read_csv(train_desc_file)
                 test_rdkit = pd.read_csv(test_desc_file)
                 top_descs = self.select_top_features(test_desc_file, trained_model_file)
@@ -356,7 +324,7 @@ class ModelAnalyzer:
         return df.sort_values(by=['delta'], ascending=False).iloc[:20, :]['SMILES']
     
     def poor_performance_eval(self, rep_no, draw=True):
-        lgbm_pred = pd.read_csv(f'./trained_models/eval_1_combined/lightgbm/predefined/rep_{rep_no}/predictions.csv')
+        lgbm_pred = pd.read_csv(f'./trained_models/eval_1_combined/lightgbm/rep_{rep_no}/predictions.csv')
         rf_pred = pd.read_csv(f'./trained_models/eval_1_combined/rf/rep_{rep_no}/predictions.csv')
         cberta_pred = pd.read_csv(f'./trained_models/eval_1_combined/chemberta-2/rep_{rep_no}/predictions.csv')
         graphormer_pred = pd.read_csv(f'./trained_models/eval_1_combined/graphormer/rep_{rep_no}/predictions.csv')
@@ -426,7 +394,7 @@ class ModelAnalyzer:
         total = pd.DataFrame(columns=['lgbm', 'rf', 'cberta', 'graphormer', 'unimol'])
         for rep in range(self.n_repetition):
             prediction_value = pd.DataFrame()
-            lgbm_pred = pd.read_csv(f'./trained_models/eval_1_combined/lightgbm/predefined/rep_{rep}/predictions.csv')
+            lgbm_pred = pd.read_csv(f'./trained_models/eval_1_combined/lightgbm/rep_{rep}/predictions.csv')
             rf_pred = pd.read_csv(f'./trained_models/eval_1_combined/rf/rep_{rep}/predictions.csv')
             cberta_pred = pd.read_csv(f'./trained_models/eval_1_combined/chemberta-2/rep_{rep}/predictions.csv')
             graphormer_pred = pd.read_csv(f'./trained_models/eval_1_combined/graphormer/rep_{rep}/predictions.csv')
@@ -448,7 +416,7 @@ class ModelAnalyzer:
         embeddings_df = pd.read_csv(test_desc_file)
         # Using rep 0 fold 0 model to select optimal neighbours and min distance
         top_descs = self.select_top_features(test_desc_file=test_desc_file, 
-                                             trained_model_file='./trained_models/eval_1_combined/lightgbm/predefined/rep_0/rdkit_trained_model_fold_0.pkl',
+                                             trained_model_file='./trained_models/eval_1_combined/lightgbm/rep_0/rdkit_trained_model_fold_0.pkl',
                                              num_top_features=num_features)
         top_descs.append('logPapp')
         model_name = 'Top RDKit Descs for LightGBM'
@@ -460,7 +428,7 @@ class ModelAnalyzer:
         test_desc_file = './data/eval_1_combined/predefined_descs/rdkit_test.csv'
         embeddings_df = pd.read_csv(test_desc_file)
         top_descs = self.select_top_features(test_desc_file=test_desc_file, 
-                                             trained_model_file='./trained_models/eval_1_combined/lightgbm/predefined/rep_0/rdkit_trained_model_fold_0.pkl',
+                                             trained_model_file='./trained_models/eval_1_combined/lightgbm/rep_0/rdkit_trained_model_fold_0.pkl',
                                              num_top_features=num_features)
         top_descs.append('logPapp')
         model_name = 'Top RDKit Descs for RF'
@@ -513,7 +481,7 @@ class ModelAnalyzer:
                 graphormer_model_name = f'Graphormer Rep {rep+1} Fold {fold+1}'
                 unimol_model_name = f'Uni-Mol Rep {rep+1} Fold {fold+1}'
                 lgbm_top_descs = self.select_top_features(test_desc_file=test_desc_file, 
-                                                          trained_model_file=f'./trained_models/eval_1_combined/lightgbm/predefined/rep_{rep}/rdkit_trained_model_fold_{fold}.pkl',
+                                                          trained_model_file=f'./trained_models/eval_1_combined/lightgbm/rep_{rep}/rdkit_trained_model_fold_{fold}.pkl',
                                                           num_top_features=num_features)
                 lgbm_top_descs.append('logPapp')
                 rf_top_descs = self.select_top_features(test_desc_file=test_desc_file, 
@@ -592,3 +560,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
