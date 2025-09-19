@@ -302,8 +302,7 @@ class ModelAnalyzer:
             split_scaffold['group_count'] = split_scaffold.groupby('group')['group'].transform('count')
             uni = split_scaffold.groupby(by='group')['unimol_pred_delta'].mean().sort_index()[:20]
             lgbm = split_scaffold.groupby(by='group')['lgbm_pred_delta'].mean().sort_index()[:20]
-            rf = split_scaffold.groupby(by='group')['rf_pred_delta'].mean().sort_index()[:20]
-            delta_df = pd.concat([uni, lgbm, rf], axis=1)
+            delta_df = pd.concat([uni, lgbm], axis=1)
             plot_group_performance(delta_df, split_num=i+1, start_grp_idx=0, end_grp_idx=10)
             plot_group_performance(delta_df, split_num=i+1, start_grp_idx=10, end_grp_idx=20)
     
@@ -448,4 +447,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
