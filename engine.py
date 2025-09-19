@@ -1,4 +1,5 @@
 import torch
+from embeddings import Embeddings
 from torch.utils.data import Dataset as TorchDataset
 from torch.utils.data import DataLoader
 from transformers import AutoConfig, AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments, GraphormerForGraphClassification
@@ -469,8 +470,6 @@ class CBERTaTrainer:
     
     def model_training(self, save_dir, train_batch_size, eval_batch_size, train_epoch, eval_steps, max_length, seed, folds=5):
         tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        config = AutoConfig.from_pretrained(self.model_name)
-        config.num_hidden_layers += 1
         model = AutoModelForSequenceClassification.from_pretrained(self.model_name, num_labels=1)
         model.to('cuda')
         kf = KFold(n_splits=folds)
@@ -505,8 +504,6 @@ class CBERTaTrainer:
     
     def model_testing(self, trained_dir, max_length, folds=5):
         tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-        config = AutoConfig.from_pretrained(self.model_name)
-        config.num_hidden_layers += 1
         r2_results = []
         mae_results = []
         mse_results = []
@@ -636,4 +633,5 @@ class UniMolTrainer:
         mae = mean_absolute_error(test_data['logPapp'], test_data['pred_logPapp'])
         mse = mean_squared_error(test_data['logPapp'], test_data['pred_logPapp'])
         return r2, mse, mae
+
 
