@@ -234,21 +234,26 @@ class ModelAnalyzer:
         return shap_values
         
     def shap_plot(self, test_desc_file, model_name, desc_type):
-        if desc_type == 'rdkit':
-            for fold in range(self.num_folds): # Not looping through repetition as first rep will give us necessary insights
-                trained_model_file = f'./trained_models/eval_1_combined/{model_name}/rep_0/rdkit_trained_model_fold_{fold}.pkl'
-                shap_values = self.shap_init(test_desc_file, trained_model_file)
-                shap.plots.bar(shap_values, max_display=9)
+        test = pd.read_csv(test_desc_file)
+        X_test = test.drop(columns=['SMILES', 'logPapp'])
+        for rep in range(self.n_repetition):
+            if desc_type == 'rdkit':
+                combined_shap_array = np.zeros((1188, 206))
+                for fold in range(self.num_folds): 
+                    trained_model_file = f'./trained_models/eval_1_combined/{model_name}/rep_{rep}/rdkit_trained_model_fold_{fold}.pkl'
+                    shap_values = self.shap_init(test_desc_file, trained_model_file)
+                    combined_shap_array = combined_shap_array + shap_values.values
+                shap_array = combined_shap_array/5
+                shap.summary_plot(shap_array, X_test, max_display=9)
                 plt.show()
-                shap.summary_plot(shap_values, max_display=9)
-                plt.show()
-        elif desc_type == 'mordred':
-            for fold in range(self.num_folds): # Not looping through repetition as first rep will give us necessary insights
-                trained_model_file = f'./trained_models/eval_1_combined/{model_name}/rep_0/mordred_trained_model_fold_{fold}.pkl'
-                shap_values = self.shap_init(test_desc_file, trained_model_file)
-                shap.plots.bar(shap_values, max_display=9)
-                plt.show()
-                shap.summary_plot(shap_values, max_display=9)
+            elif desc_type == 'mordred':
+                combined_shap_array = np.zeros((1176, 1509))
+                for fold in range(self.num_folds): 
+                    trained_model_file = f'./trained_models/eval_1_combined/{model_name}/rep_{rep}/mordred_trained_model_fold_{fold}.pkl'
+                    shap_values = self.shap_init(test_desc_file, trained_model_file)
+                    combined_shap_array = combined_shap_array + shap_values.values
+                shap_array = combined_shap_array/5
+                shap.summary_plot(shap_array, X_test, max_display=9)
                 plt.show()
         
     def select_top_features(self, test_desc_file, trained_model_file, num_top_features=100):
@@ -264,6 +269,8 @@ class ModelAnalyzer:
         return top_descs
     
     def lgbm_top_descs_analysis(self, test_desc_file, train_desc_file, num_top_features=100):
+        color_list = ['red', 'green', 'blue', 'orange', 'purple']
+        legend_list = ['Fold 1', 'Fold 2', 'Fold 3', 'Fold 4', 'Fold 5']
         for rep in range(self.n_repetition):
             for fold in range(self.num_folds):
                 trained_model_file=f'./trained_models/eval_1_combined/lightgbm/rep_{rep}/rdkit_trained_model_fold_{fold}.pkl'
@@ -284,9 +291,14 @@ class ModelAnalyzer:
                     r2_results[f'top_{i}_feature'] = r2
                     mae_results[f'top_{i}_feature'] = mae
                     mse_results[f'top_{i}_feature'] = mse
-                plot_top_feature_performance(mae_results, model_name='LightGBM')
+                plot_top_feature_performance(mae_results, model_name='LightGBM', color=color_list[fold])
+                legend_list
+            plt.legend(legend_list, loc='upper right')
+            plt.show()
     
     def rf_top_descs_analysis(self, test_desc_file, train_desc_file, num_top_features=100):
+        color_list = ['red', 'green', 'blue', 'orange', 'purple']
+        legend_list = ['Fold 1', 'Fold 2', 'Fold 3', 'Fold 4', 'Fold 5']
         for rep in range(self.n_repetition):
             for fold in range(self.num_folds):
                 trained_model_file=f'./trained_models/eval_1_combined/rf/rep_{rep}/rdkit_trained_model_fold_{fold}.pkl'
@@ -307,7 +319,9 @@ class ModelAnalyzer:
                     r2_results[f'top_{i}_feature'] = r2
                     mae_results[f'top_{i}_feature'] = mae
                     mse_results[f'top_{i}_feature'] = mse
-                plot_top_feature_performance(mae_results, model_name='RF')
+                plot_top_feature_performance(mae_results, model_name='RF', color=color_list[fold])
+            plt.legend(legend_list, loc='upper right')
+            plt.show()
         
     def prediction_plot(self):
         model_names = ['lightgbm', 'rf', 'chemberta-2', 'graphormer', 'unimol']
@@ -391,7 +405,7 @@ class ModelAnalyzer:
             json.dump(compiled_dict, f, indent=2)
             
     def compile_poorest_predictions(self):
-        total = pd.DataFrame(columns=['lgbm', 'rf', 'cberta', 'graphormer', 'unimol'])
+        total = pd.DataFrame(columns=['lgbm', 'cberta', 'graphormer', 'unimol'])
         for rep in range(self.n_repetition):
             prediction_value = pd.DataFrame()
             lgbm_pred = pd.read_csv(f'./trained_models/eval_1_combined/lightgbm/rep_{rep}/predictions.csv')
@@ -401,13 +415,12 @@ class ModelAnalyzer:
             unimol_pred = pd.read_csv(f'./trained_models/eval_1_combined/unimol/rep_{rep}/predictions.csv')
             poorest_performing = self.poor_performance_eval(rep, draw=False)
             prediction_value['lgbm'] = lgbm_pred.loc[poorest_performing.index,'pred_logPapp']
-            prediction_value['rf'] = rf_pred.loc[poorest_performing.index,'pred_logPapp']
             prediction_value['cberta'] = cberta_pred.loc[poorest_performing.index,'pred_logPapp']
             prediction_value['graphormer'] = graphormer_pred.loc[poorest_performing.index,'pred_logPapp']
             prediction_value['unimol'] = unimol_pred.loc[poorest_performing.index,'pred_logPapp']
             total = pd.concat([total, prediction_value], axis=0)
-        total['mean_pred'] = total.iloc[:,:5].mean(axis=1)
-        total['std'] = total.iloc[:,:5].std(axis=1)
+        total['mean_pred'] = total.iloc[:,:4].mean(axis=1)
+        total['std'] = total.iloc[:,:4].std(axis=1)
         total = total.reset_index(drop=True)
         return total
     
@@ -516,9 +529,7 @@ class ModelAnalyzer:
         test_mordred_file = './data/eval_1_combined/predefined_descs/mordred_test.csv'
         train_desc_file = './data/eval_1_combined/predefined_descs/rdkit_train.csv'
         self.shap_plot(test_rdkit_file, model_name='lightgbm', desc_type='rdkit')
-        self.shap_plot(test_rdkit_file, model_name='rf', desc_type='rdkit')
         self.shap_plot(test_mordred_file, model_name='lightgbm', desc_type='mordred')
-        self.shap_plot(test_mordred_file, model_name='rf', desc_type='mordred')
         self.lgbm_top_descs_analysis(test_rdkit_file, train_desc_file)
         self.rf_top_descs_analysis(test_rdkit_file, train_desc_file)
         self.prediction_plot()
@@ -560,4 +571,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
