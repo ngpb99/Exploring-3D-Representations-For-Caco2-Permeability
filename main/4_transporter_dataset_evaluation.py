@@ -192,21 +192,21 @@ class TransporterEval:
         combined = pd.concat([train_descs, transporter_descs], axis=0)
         if poorest_mols==True:
             all_mols = self.select_poorest_mols()
-            selected_mols = ['NS(=O)(=O)C1=C(Cl)C=C(NCC2=CC=CO2)C(=C1)C(O)=O', 
+            selected_mols = ['C[C@@H]1O[C@@H](OC[C@H]2O[C@@H](OC3=C(OC4=CC(O)=CC(O)=C4C3=O)C3=CC(O)=C(O)C=C3)[C@H](O)[C@@H](O)[C@@H]2O)[C@H](O)[C@H](O)[C@H]1O', 
                              '[H][C@]12[C@H](OC(=O)C3=CC=CC=C3)[C@]3(O)C[C@H](OC(=O)[C@H](O)[C@@H](NC(=O)C4=CC=CC=C4)C4=CC=CC=C4)C(C)=C([C@@H](OC(C)=O)C(=O)[C@]1(C)[C@@H](O)C[C@H]1OC[C@@]21OC(C)=O)C3(C)C',
                              'CCC[C@@]1(CCC2=CC=CC=C2)CC(O)=C([C@H](CC)C2=CC=CC(NS(=O)(=O)C3=NC=C(C=C3)C(F)(F)F)=C2)C(=O)O1', 
                              'ClC1=CC=CC(N2CCN(CCCCOC3=CC=C4CCC(=O)NC4=C3)CC2)=C1Cl',
-                             'CON=C(C(=O)N[C@H]1[C@H]2SCC(COC(N)=O)=C(N2C1=O)C(=O)OC(C)OC(C)=O)C1=CC=CO1', 
-                             '[H][C@]12SCC(C[N+]3=CC=CC=C3)=C(N1C(=O)[C@H]2NC(=O)CC1=CC=CS1)C([O-])=O'
+                             '[Na+].NS(=O)(=O)C1=CC2=C(C=C1Cl)N=C[N-]S2(=O)=O', 
+                             'NC(=O)C1=CN(CC2=C(F)C=CC=C2F)N=N1'
                              ]
         else:
             all_mols = self.select_best_mols()
-            selected_mols = ['[H][C@]12CC[C@]3([H])[C@]([H])(C[C@@H](O)[C@]4(C)[C@H](CC[C@]34O)C3=CC(=O)OC3)[C@@]1(C)CC[C@@H](C2)O[C@H]1C[C@H](O)[C@H](O[C@H]2C[C@H](O)[C@H](O[C@H]3C[C@H](O)[C@H](O)[C@@H](C)O3)[C@@H](C)O2)[C@@H](C)O1', 
+            selected_mols = ['[H][C@@]12OCC3=C/C=C/[C@H](C)[C@H](O[C@H]4C[C@@H](OC)[C@@H](O[C@H]5C[C@@H](OC)[C@@H](O)[C@H](C)O5)[C@H](C)O4)C(C)=CC[C@@H]4C[C@@H](C[C@]5(CC[C@H](C)C(O5)[C@@H](C)CC)O4)OC(=O)[C@H](C=C(C)[C@H]1O)[C@@]23O', 
                              'CCN1C(=O)N(CC)C2=C(N(C)C(/C=C/C3=CC=C(OC)C(OC)=C3)=N2)C1=O',
                              'COC1=CC(=CC=C1OCCCN1CCC(CC1)C1=NOC2=CC(F)=CC=C12)C(C)=O', 
                              'FC(F)OC1=CC=C(C=C1OCC1CC1)C(=O)NC1=C(Cl)C=NC=C1Cl',
-                             'Cc2c(CC(=O)O)c1cc(F)ccc1c2=Cc3ccc(S(C)=O)cc3', 
-                             '[H][C@]12SCC(COC(C)=O)=C(N1C(=O)[C@H]2NC(=O)[C@H](N)C1=CC=CC=C1)C(O)=O'
+                             '[H][C@@]12CC3=C4C(O[C@H]5C(=O)CC[C@]1(O)[C@@]45CCN2CC1CC1)=C(O)C=C3', 
+                             'CCOC(=O)NC1=C(N)C=C(NCC2=CC=C(F)C=C2)C=C1'
                              ]
         net_mols = [x for x in transporter_descs['SMILES'].tolist() if x not in selected_mols]
         filtered_transporter_descs = transporter_descs[transporter_descs['SMILES'].isin(all_mols)]
@@ -257,3 +257,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
