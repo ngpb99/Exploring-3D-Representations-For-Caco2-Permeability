@@ -1,6 +1,6 @@
 # Exploring the Effectiveness of Three-Dimensional Molecular Representations in Caco-2 Permeability Prediction
 
-![image_alt]()
+![image_alt](https://github.com/ngpb99/Exploring-3D-Representations-For-Caco2-Permeability/blob/c1b4bda1797f7d4cc13be848beca15e016aff863/graphic.png)
 
 This repository contains the necessary scripts to replicate the work performed.
 
